@@ -7,6 +7,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #6a75f8;
+            --accent-color: #8e44ad;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --border-radius: 8px;
+            --box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -14,43 +28,71 @@
         }
         
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
         }
         
         .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
             display: flex;
-            gap: 20px;
+            gap: 25px;
+            flex-wrap: wrap;
         }
         
-        .form-section {
+        .form-section, .preview-section {
             flex: 1;
+            min-width: 300px;
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
             height: fit-content;
         }
         
         .preview-section {
-            flex: 1;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            height: fit-content;
             position: sticky;
             top: 20px;
         }
         
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
         .invoice-container {
-            border: 2px solid #333;
+            border: 2px solid #e0e0e0;
             padding: 20px;
             background: white;
+            position: relative;
+            overflow: hidden;
         }
         
         .invoice-header {
@@ -91,13 +133,16 @@
             justify-content: space-between;
             margin-bottom: 20px;
             gap: 20px;
+            flex-wrap: wrap;
         }
         
         .address-box {
             flex: 1;
-            padding: 10px;
+            min-width: 200px;
+            padding: 15px;
             border: 1px solid #ddd;
             background: #fafafa;
+            border-radius: 5px;
         }
         
         .address-title {
@@ -119,8 +164,11 @@
             justify-content: space-between;
             margin-bottom: 20px;
             background: #f5f5f5;
-            padding: 10px;
+            padding: 15px;
             border: 1px solid #ddd;
+            border-radius: 5px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .detail-item {
@@ -141,6 +189,7 @@
             background: white;
             border: 1px solid #ccc;
             min-width: 120px;
+            border-radius: 4px;
         }
         
         .items-table {
@@ -148,19 +197,20 @@
             border-collapse: collapse;
             margin-bottom: 20px;
             font-size: 11px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .items-table th {
-            background: #333;
+            background: var(--primary-color);
             color: white;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
             font-weight: bold;
-            border: 1px solid #333;
+            border: 1px solid var(--primary-color);
         }
         
         .items-table td {
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #ddd;
             text-align: center;
         }
@@ -168,15 +218,18 @@
         .items-table input {
             width: 100%;
             border: none;
-            padding: 4px;
+            padding: 6px;
             font-size: 11px;
             text-align: center;
             background: transparent;
+            border-radius: 3px;
+            transition: var(--transition);
         }
         
         .items-table input:focus {
             background: #ffffcc;
-            outline: 1px solid #333;
+            outline: 1px solid var(--primary-color);
+            box-shadow: 0 0 5px rgba(74, 108, 247, 0.3);
         }
         
         .tax-breakdown {
@@ -188,10 +241,11 @@
         .tax-table {
             width: 300px;
             border-collapse: collapse;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .tax-table td {
-            padding: 5px 10px;
+            padding: 8px 12px;
             border: 1px solid #ddd;
             font-size: 12px;
         }
@@ -209,19 +263,21 @@
         
         .amount-words {
             margin-top: 20px;
-            padding: 10px;
+            padding: 12px;
             background: #f9f9f9;
             border: 1px dashed #999;
             font-size: 12px;
             font-style: italic;
+            border-radius: 5px;
         }
         
         .bank-details {
             margin-top: 20px;
-            padding: 10px;
+            padding: 12px;
             background: #f0f8ff;
             border: 1px solid #cce0ff;
             font-size: 11px;
+            border-radius: 5px;
         }
         
         .bank-title {
@@ -236,11 +292,14 @@
             margin-top: 40px;
             padding-top: 20px;
             border-top: 1px solid #ddd;
+            flex-wrap: wrap;
+            gap: 20px;
         }
         
         .signature-box {
-            width: 200px;
+            min-width: 150px;
             text-align: center;
+            flex: 1;
         }
         
         .signature-line {
@@ -255,28 +314,38 @@
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            font-size: 12px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
             color: #555;
         }
         
         .form-group input,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(74, 108, 247, 0.3);
+            outline: none;
         }
         
         .form-group textarea {
-            height: 60px;
+            height: 70px;
             resize: vertical;
         }
         
@@ -285,57 +354,80 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
+            font-weight: 600;
+            transition: var(--transition);
             margin-right: 10px;
+            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .btn i {
+            font-size: 14px;
         }
         
         .btn-primary {
-            background: #4CAF50;
+            background: var(--primary-color);
             color: white;
         }
         
         .btn-primary:hover {
-            background: #45a049;
+            background: #3a5bd9;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         
         .btn-secondary {
-            background: #2196F3;
+            background: var(--secondary-color);
             color: white;
         }
         
         .btn-secondary:hover {
-            background: #0b7dda;
+            background: #5a65e6;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
         .btn-danger {
-            background: #f44336;
+            background: var(--danger-color);
             color: white;
         }
         
         .btn-danger:hover {
-            background: #d32f2f;
+            background: #c82333;
         }
         
         .button-group {
-            margin-top: 20px;
+            margin-top: 25px;
             text-align: center;
         }
         
         .item-actions {
-            margin-top: 10px;
+            margin-top: 15px;
             text-align: center;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
         
         .notification {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: #4CAF50;
+            background: var(--success-color);
             color: white;
             padding: 15px 20px;
             border-radius: 5px;
@@ -343,6 +435,7 @@
             display: none;
             z-index: 1000;
             animation: slideIn 0.3s ease;
+            max-width: 300px;
         }
         
         @keyframes slideIn {
@@ -357,7 +450,12 @@
         }
         
         .notification.error {
-            background: #f44336;
+            background: var(--danger-color);
+        }
+        
+        .notification.warning {
+            background: var(--warning-color);
+            color: var(--dark-color);
         }
         
         .watermark {
@@ -365,14 +463,28 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 100px;
+            font-size: 80px;
             color: rgba(0, 0, 0, 0.05);
             font-weight: bold;
             pointer-events: none;
             z-index: 1;
         }
         
-        @media (max-width: 768px) {
+        .mobile-menu-btn {
+            display: none;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            width: 100%;
+            font-weight: 600;
+        }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 992px) {
             .main-container {
                 flex-direction: column;
             }
@@ -380,195 +492,360 @@
             .preview-section {
                 position: static;
             }
+            
+            .invoice-details {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .detail-item {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .tax-breakdown {
+                justify-content: center;
+            }
+            
+            .tax-table {
+                width: 100%;
+            }
+            
+            .signature-section {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .signature-box {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .form-section, .preview-section {
+                padding: 20px 15px;
+            }
+            
+            .invoice-container {
+                padding: 15px;
+            }
+            
+            .address-section {
+                flex-direction: column;
+            }
+            
+            .items-table {
+                font-size: 10px;
+            }
+            
+            .items-table th, 
+            .items-table td {
+                padding: 6px 4px;
+            }
+            
+            .watermark {
+                font-size: 60px;
+            }
+            
+            .btn {
+                padding: 8px 15px;
+                font-size: 13px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.7rem;
+            }
+            
+            .section-title {
+                font-size: 1.3rem;
+            }
+            
+            .invoice-title {
+                font-size: 20px;
+            }
+            
+            .items-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .button-group {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-right: 0;
+            }
+            
+            .item-actions {
+                flex-direction: column;
+            }
+            
+            .watermark {
+                font-size: 40px;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            .invoice-container, .invoice-container * {
+                visibility: visible;
+            }
+            
+            .invoice-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+                border: none;
+            }
+            
+            .btn, .form-section, .header, .notification {
+                display: none !important;
+            }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="main-container">
-        <div class="form-section">
-            <h2 style="margin-bottom: 20px; color: #333;">Invoice Details</h2>
-            
-            <div class="form-group">
-                <label for="companyName">Company Name</label>
-                <input type="text" id="companyName" value="Arasan E-Bikes" onchange="updatePreview()">
-            </div>
-            
-            <div class="form-group">
-                <label for="companyAddress">Company Address</label>
-                <textarea id="companyAddress" onchange="updatePreview()">123, Business Park, GST Road,
-Chennai - 600001
-Tamil Nadu, India</textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="companyGST">Company GSTIN</label>
-                <input type="text" id="companyGST" value="33AAAPL1234C1ZV" onchange="updatePreview()">
-            </div>
-            
-            <div class="form-group">
-                <label for="customerName">Customer Name</label>
-                <input type="text" id="customerName" value="R.PUGALMANI" onchange="updatePreview()">
-            </div>
-            
-            <div class="form-group">
-                <label for="customerAddress">Customer Address</label>
-                <textarea id="customerAddress" onchange="updatePreview()">456, Customer Street,
-Anna Nagar,
-Chennai - 600040</textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="customerGST">Customer GSTIN</label>
-                <input type="text" id="customerGST" value="33BBBPL5678D2ZV" onchange="updatePreview()">
-            </div>
-            
-            <div class="form-group">
-                <label for="invoiceNumber">Invoice Number</label>
-                <input type="text" id="invoiceNumber" value="INV-6" onchange="updatePreview()">
-            </div>
-            
-            <div class="form-group">
-                <label for="invoiceDate">Invoice Date</label>
-                <input type="date" id="invoiceDate" value="2025-10-18" onchange="updatePreview()">
-            </div>
-            
-            <h3 style="margin: 20px 0 10px; color: #333;">Items</h3>
-            <div class="item-actions">
-                <button class="btn btn-primary" onclick="addItem()">Add Item</button>
-                <button class="btn btn-danger" onclick="removeItem()">Remove Item</button>
-            </div>
-            
-            <div class="button-group">
-                <button class="btn btn-secondary" onclick="downloadPDF()">Download PDF</button>
-                <button class="btn btn-primary" onclick="printInvoice()">Print</button>
-            </div>
+    <div class="container">
+        <div class="header">
+            <h1>Tax Invoice Generator</h1>
+            <p>Create professional tax invoices in minutes</p>
         </div>
         
-        <div class="preview-section">
-            <h2 style="margin-bottom: 20px; color: #333;">Invoice Preview</h2>
-            <div class="invoice-container" id="invoicePreview">
-                <div class="watermark">ORIGINAL</div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i> Toggle Sections
+        </button>
+        
+        <div class="main-container">
+            <div class="form-section" id="formSection">
+                <h2 class="section-title">Invoice Details</h2>
                 
-                <div class="invoice-header">
-                    <div class="company-logo">ARASAN E-BIKES</div>
-                    <div class="invoice-title">TAX INVOICE</div>
-                    <div class="invoice-subtitle">(Original for Recipient)</div>
+                <div class="form-group">
+                    <label for="companyName"><i class="fas fa-building"></i> Company Name</label>
+                    <input type="text" id="companyName" value="Arasan E-Bikes" onchange="updatePreview()">
                 </div>
                 
-                <div class="address-section">
-                    <div class="address-box">
-                        <div class="address-title">Sold By:</div>
-                        <div class="address-content" id="previewCompany">
-                            <strong>Arasan E-Bikes</strong><br>
-                            123, Business Park, GST Road,<br>
-                            Chennai - 600001<br>
-                            Tamil Nadu, India<br>
-                            GSTIN: 33AAAPL1234C1ZV
+                <div class="form-group">
+                    <label for="companyAddress"><i class="fas fa-map-marker-alt"></i> Company Address</label>
+                    <textarea id="companyAddress" onchange="updatePreview()">123, Business Park, GST Road,
+Chennai - 600001
+Tamil Nadu, India</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="companyGST"><i class="fas fa-id-card"></i> Company GSTIN</label>
+                    <input type="text" id="companyGST" value="33AAAPL1234C1ZV" onchange="updatePreview()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerName"><i class="fas fa-user"></i> Customer Name</label>
+                    <input type="text" id="customerName" value="R.PUGALMANI" onchange="updatePreview()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerAddress"><i class="fas fa-map-marker-alt"></i> Customer Address</label>
+                    <textarea id="customerAddress" onchange="updatePreview()">456, Customer Street,
+Anna Nagar,
+Chennai - 600040</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerGST"><i class="fas fa-id-card"></i> Customer GSTIN</label>
+                    <input type="text" id="customerGST" value="33BBBPL5678D2ZV" onchange="updatePreview()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="invoiceNumber"><i class="fas fa-file-invoice"></i> Invoice Number</label>
+                    <input type="text" id="invoiceNumber" value="INV-6" onchange="updatePreview()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="invoiceDate"><i class="fas fa-calendar-alt"></i> Invoice Date</label>
+                    <input type="date" id="invoiceDate" value="2025-10-18" onchange="updatePreview()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="taxRate"><i class="fas fa-percentage"></i> GST Rate (%)</label>
+                    <select id="taxRate" onchange="updatePreview()">
+                        <option value="5">5%</option>
+                        <option value="12">12%</option>
+                        <option value="18" selected>18%</option>
+                        <option value="28">28%</option>
+                    </select>
+                </div>
+                
+                <h3 class="section-title">Items</h3>
+                <div class="item-actions">
+                    <button class="btn btn-success" onclick="addItem()">
+                        <i class="fas fa-plus"></i> Add Item
+                    </button>
+                    <button class="btn btn-danger" onclick="removeItem()">
+                        <i class="fas fa-minus"></i> Remove Item
+                    </button>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="downloadPDF()">
+                        <i class="fas fa-download"></i> Download PDF
+                    </button>
+                    <button class="btn btn-primary" onclick="printInvoice()">
+                        <i class="fas fa-print"></i> Print Invoice
+                    </button>
+                    <button class="btn btn-primary" onclick="saveInvoice()">
+                        <i class="fas fa-save"></i> Save Data
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadInvoice()">
+                        <i class="fas fa-folder-open"></i> Load Data
+                    </button>
+                </div>
+            </div>
+            
+            <div class="preview-section" id="previewSection">
+                <h2 class="section-title">Invoice Preview</h2>
+                <div class="invoice-container" id="invoicePreview">
+                    <div class="watermark">ORIGINAL</div>
+                    
+                    <div class="invoice-header">
+                        <div class="invoice-title">TAX INVOICE</div>
+                        <div class="invoice-subtitle">(Original for Recipient)</div>
+                    </div>
+                    
+                    <div class="address-section">
+                        <div class="address-box">
+                            <div class="address-title">Sold By:</div>
+                            <div class="address-content" id="previewCompany">
+                                <strong>Arasan E-Bikes</strong><br>
+                                123, Business Park, GST Road,<br>
+                                Chennai - 600001<br>
+                                Tamil Nadu, India<br>
+                                GSTIN: 33AAAPL1234C1ZV
+                            </div>
+                        </div>
+                        <div class="address-box">
+                            <div class="address-title">Billing Address:</div>
+                            <div class="address-content" id="previewCustomer">
+                                <strong>R.PUGALMANI</strong><br>
+                                456, Customer Street,<br>
+                                Anna Nagar,<br>
+                                Chennai - 600040<br>
+                                GSTIN: 33BBBPL5678D2ZV
+                            </div>
                         </div>
                     </div>
-                    <div class="address-box">
-                        <div class="address-title">Billing Address:</div>
-                        <div class="address-content" id="previewCustomer">
-                            <strong>R.PUGALMANI</strong><br>
-                            456, Customer Street,<br>
-                            Anna Nagar,<br>
-                            Chennai - 600040<br>
-                            GSTIN: 33BBBPL5678D2ZV
+                    
+                    <div class="invoice-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Invoice No:</span>
+                            <span class="detail-value" id="previewInvNo">INV-6</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Date:</span>
+                            <span class="detail-value" id="previewDate">18-Oct-2025</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">State:</span>
+                            <span class="detail-value">Tamil Nadu</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Code:</span>
+                            <span class="detail-value">33</span>
                         </div>
                     </div>
-                </div>
-                
-                <div class="invoice-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Invoice No:</span>
-                        <span class="detail-value" id="previewInvNo">INV-6</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Date:</span>
-                        <span class="detail-value" id="previewDate">18-Oct-2025</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">State:</span>
-                        <span class="detail-value">Tamil Nadu</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Code:</span>
-                        <span class="detail-value">33</span>
-                    </div>
-                </div>
-                
-                <table class="items-table" id="itemsTable">
-                    <thead>
-                        <tr>
-                            <th>S.No</th>
-                            <th>Description</th>
-                            <th>HSN/SAC</th>
-                            <th>Qty</th>
-                            <th>Rate</th>
-                            <th>Per</th>
-                            <th>Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody id="itemsBody">
-                        <tr>
-                            <td>1</td>
-                            <td><input type="text" value="WARRIOR LI PRIME - 2" onchange="updatePreview()"></td>
-                            <td><input type="text" value="8517" onchange="updatePreview()"></td>
-                            <td><input type="number" value="1" onchange="updatePreview()"></td>
-                            <td><input type="number" value="90000.00" onchange="updatePreview()"></td>
-                            <td>Nos</td>
-                            <td class="amount">90000.00</td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <div class="tax-breakdown">
-                    <table class="tax-table">
-                        <tr>
-                            <td class="label">Taxable Amount</td>
-                            <td id="taxableAmount">90000.00</td>
-                        </tr>
-                        <tr>
-                            <td class="label">CGST (9%)</td>
-                            <td id="cgstAmount">8100.00</td>
-                        </tr>
-                        <tr>
-                            <td class="label">SGST (9%)</td>
-                            <td id="sgstAmount">8100.00</td>
-                        </tr>
-                        <tr>
-                            <td class="label">IGST (0%)</td>
-                            <td id="igstAmount">0.00</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Total Tax</td>
-                            <td id="totalTax">16200.00</td>
-                        </tr>
-                        <tr>
-                            <td class="total">Invoice Total</td>
-                            <td class="total" id="invoiceTotal">106200.00</td>
-                        </tr>
+                    
+                    <table class="items-table" id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Description</th>
+                                <th>HSN/SAC</th>
+                                <th>Qty</th>
+                                <th>Rate</th>
+                                <th>Per</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsBody">
+                            <tr>
+                                <td>1</td>
+                                <td><input type="text" value="WARRIOR LI PRIME - 2" onchange="updatePreview()"></td>
+                                <td><input type="text" value="8517" onchange="updatePreview()"></td>
+                                <td><input type="number" value="1" min="0" step="1" onchange="updatePreview()"></td>
+                                <td><input type="number" value="90000.00" min="0" step="0.01" onchange="updatePreview()"></td>
+                                <td>Nos</td>
+                                <td class="amount">90000.00</td>
+                            </tr>
+                        </tbody>
                     </table>
-                </div>
-                
-                <div class="amount-words">
-                    <strong>Amount in Words:</strong> <span id="amountWords">One Lakh Six Thousand Two Hundred Rupees Only</span>
-                </div>
-                
-                <div class="bank-details">
-                    <div class="bank-title">Bank Details:</div>
-                    Bank Name: State Bank of India | Account No: 1234567890 | IFSC: SBIN0001234
-                </div>
-                
-                <div class="signature-section">
-                    <div class="signature-box">
-                        <div class="signature-line"></div>
-                        <div class="signature-text">Customer Signature</div>
+                    
+                    <div class="tax-breakdown">
+                        <table class="tax-table">
+                            <tr>
+                                <td class="label">Taxable Amount</td>
+                                <td id="taxableAmount">90000.00</td>
+                            </tr>
+                            <tr>
+                                <td class="label">CGST (<span id="cgstRate">9</span>%)</td>
+                                <td id="cgstAmount">8100.00</td>
+                            </tr>
+                            <tr>
+                                <td class="label">SGST (<span id="sgstRate">9</span>%)</td>
+                                <td id="sgstAmount">8100.00</td>
+                            </tr>
+                            <tr>
+                                <td class="label">IGST (0%)</td>
+                                <td id="igstAmount">0.00</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Total Tax</td>
+                                <td id="totalTax">16200.00</td>
+                            </tr>
+                            <tr>
+                                <td class="total">Invoice Total</td>
+                                <td class="total" id="invoiceTotal">106200.00</td>
+                            </tr>
+                        </table>
                     </div>
-                    <div class="signature-box">
-                        <div class="signature-line"></div>
-                        <div class="signature-text">For Arasan E-Bikes</div>
-                        <div style="margin-top: 20px; font-weight: bold;">Authorized Signatory</div>
+                    
+                    <div class="amount-words">
+                        <strong>Amount in Words:</strong> <span id="amountWords">One Lakh Six Thousand Two Hundred Rupees Only</span>
+                    </div>
+                    
+                    <div class="signature-section">
+                        <div class="signature-box">
+                            <div class="signature-line"></div>
+                            <div class="signature-text">Customer Signature</div>
+                        </div>
+                        <div class="signature-box">
+                            <div class="signature-line"></div>
+                            <div class="signature-text">For Arasan E-Bikes</div>
+                            <div style="margin-top: 20px; font-weight: bold;">Authorized Signatory</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -579,6 +856,20 @@ Chennai - 600040</textarea>
     
     <script>
         let itemCount = 1;
+        
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            const formSection = document.getElementById('formSection');
+            const previewSection = document.getElementById('previewSection');
+            
+            if (formSection.style.display === 'none') {
+                formSection.style.display = 'block';
+                previewSection.style.display = 'block';
+            } else {
+                formSection.style.display = 'none';
+                previewSection.style.display = 'block';
+            }
+        });
         
         function updatePreview() {
             // Update company details
@@ -620,8 +911,8 @@ Chennai - 600040</textarea>
                 <td>${itemCount}</td>
                 <td><input type="text" placeholder="Item description" onchange="updatePreview()"></td>
                 <td><input type="text" placeholder="HSN/SAC" onchange="updatePreview()"></td>
-                <td><input type="number" value="1" onchange="updatePreview()"></td>
-                <td><input type="number" value="0" onchange="updatePreview()"></td>
+                <td><input type="number" value="1" min="0" step="1" onchange="updatePreview()"></td>
+                <td><input type="number" value="0" min="0" step="0.01" onchange="updatePreview()"></td>
                 <td>Nos</td>
                 <td class="amount">0.00</td>
             `;
@@ -654,8 +945,14 @@ Chennai - 600040</textarea>
                 taxableAmount += amount;
             });
             
-            const cgst = taxableAmount * 0.09;
-            const sgst = taxableAmount * 0.09;
+            const taxRate = parseFloat(document.getElementById('taxRate').value) || 18;
+            const halfTaxRate = taxRate / 2;
+            
+            document.getElementById('cgstRate').textContent = halfTaxRate;
+            document.getElementById('sgstRate').textContent = halfTaxRate;
+            
+            const cgst = taxableAmount * (halfTaxRate / 100);
+            const sgst = taxableAmount * (halfTaxRate / 100);
             const igst = 0;
             const totalTax = cgst + sgst + igst;
             const invoiceTotal = taxableAmount + totalTax;
@@ -675,9 +972,21 @@ Chennai - 600040</textarea>
             const a = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
             const b = ['', '', 'Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
             
-            if ((num = num.toString()).length > 9) return 'overflow';
+            if ((num = num.toString()).length > 9) return 'Amount too large to convert';
+            
+            // Handle decimal part
+            let decimalPart = '';
+            if (num.includes('.')) {
+                const parts = num.split('.');
+                num = parts[0];
+                const decimals = parts[1] || '00';
+                if (decimals !== '00') {
+                    decimalPart = ' and ' + numberToWords(parseInt(decimals)) + ' Paise';
+                }
+            }
+            
             const n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
-            if (!n) return;
+            if (!n) return 'Invalid number';
             
             let str = '';
             str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + ' Crore ' : '';
@@ -686,12 +995,12 @@ Chennai - 600040</textarea>
             str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + ' Hundred ' : '';
             str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
             
-            return str;
+            return str + decimalPart;
         }
         
         function downloadPDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+            const doc = new jsPDF('p', 'mm', 'a4');
             
             // Get the invoice preview element
             const element = document.getElementById('invoicePreview');
@@ -709,6 +1018,9 @@ Chennai - 600040</textarea>
                 doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
                 doc.save(`Invoice_${document.getElementById('invoiceNumber').value}.pdf`);
                 showNotification('PDF downloaded successfully');
+            }).catch(error => {
+                console.error('Error generating PDF:', error);
+                showNotification('Error generating PDF', 'error');
             });
         }
         
@@ -718,10 +1030,111 @@ Chennai - 600040</textarea>
             
             document.body.innerHTML = printContent;
             window.print();
-            document.body.innerHTML = originalContent;
             
-            // Re-initialize event listeners
-            location.reload();
+            // Restore the original content after printing
+            setTimeout(() => {
+                document.body.innerHTML = originalContent;
+                // Re-initialize event listeners
+                initializeEventListeners();
+            }, 500);
+        }
+        
+        function saveInvoice() {
+            const invoiceData = {
+                companyName: document.getElementById('companyName').value,
+                companyAddress: document.getElementById('companyAddress').value,
+                companyGST: document.getElementById('companyGST').value,
+                customerName: document.getElementById('customerName').value,
+                customerAddress: document.getElementById('customerAddress').value,
+                customerGST: document.getElementById('customerGST').value,
+                invoiceNumber: document.getElementById('invoiceNumber').value,
+                invoiceDate: document.getElementById('invoiceDate').value,
+                taxRate: document.getElementById('taxRate').value,
+                items: []
+            };
+            
+            const rows = document.querySelectorAll('#itemsBody tr');
+            rows.forEach(row => {
+                invoiceData.items.push({
+                    description: row.cells[1].querySelector('input').value,
+                    hsn: row.cells[2].querySelector('input').value,
+                    qty: row.cells[3].querySelector('input').value,
+                    rate: row.cells[4].querySelector('input').value
+                });
+            });
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(invoiceData));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "invoice_data.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            
+            showNotification('Invoice data saved successfully');
+        }
+        
+        function loadInvoice() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    try {
+                        const invoiceData = JSON.parse(event.target.result);
+                        
+                        document.getElementById('companyName').value = invoiceData.companyName || '';
+                        document.getElementById('companyAddress').value = invoiceData.companyAddress || '';
+                        document.getElementById('companyGST').value = invoiceData.companyGST || '';
+                        document.getElementById('customerName').value = invoiceData.customerName || '';
+                        document.getElementById('customerAddress').value = invoiceData.customerAddress || '';
+                        document.getElementById('customerGST').value = invoiceData.customerGST || '';
+                        document.getElementById('invoiceNumber').value = invoiceData.invoiceNumber || '';
+                        document.getElementById('invoiceDate').value = invoiceData.invoiceDate || '';
+                        document.getElementById('taxRate').value = invoiceData.taxRate || '18';
+                        
+                        // Clear existing items
+                        const tbody = document.getElementById('itemsBody');
+                        tbody.innerHTML = '';
+                        itemCount = 0;
+                        
+                        // Add items from loaded data
+                        if (invoiceData.items && invoiceData.items.length > 0) {
+                            invoiceData.items.forEach(item => {
+                                itemCount++;
+                                const newRow = document.createElement('tr');
+                                newRow.innerHTML = `
+                                    <td>${itemCount}</td>
+                                    <td><input type="text" value="${item.description || ''}" onchange="updatePreview()"></td>
+                                    <td><input type="text" value="${item.hsn || ''}" onchange="updatePreview()"></td>
+                                    <td><input type="number" value="${item.qty || 1}" min="0" step="1" onchange="updatePreview()"></td>
+                                    <td><input type="number" value="${item.rate || 0}" min="0" step="0.01" onchange="updatePreview()"></td>
+                                    <td>Nos</td>
+                                    <td class="amount">0.00</td>
+                                `;
+                                tbody.appendChild(newRow);
+                            });
+                        } else {
+                            // Add a default item if no items in data
+                            addItem();
+                        }
+                        
+                        updatePreview();
+                        showNotification('Invoice data loaded successfully');
+                    } catch (error) {
+                        console.error('Error loading invoice data:', error);
+                        showNotification('Error loading invoice data', 'error');
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
         }
         
         function showNotification(message, type = 'success') {
@@ -730,6 +1143,8 @@ Chennai - 600040</textarea>
             notification.className = 'notification';
             if (type === 'error') {
                 notification.classList.add('error');
+            } else if (type === 'warning') {
+                notification.classList.add('warning');
             }
             notification.style.display = 'block';
             
@@ -738,9 +1153,39 @@ Chennai - 600040</textarea>
             }, 3000);
         }
         
+        function initializeEventListeners() {
+            // Re-attach event listeners after page reload
+            document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+                const formSection = document.getElementById('formSection');
+                const previewSection = document.getElementById('previewSection');
+                
+                if (formSection.style.display === 'none') {
+                    formSection.style.display = 'block';
+                    previewSection.style.display = 'block';
+                } else {
+                    formSection.style.display = 'none';
+                    previewSection.style.display = 'block';
+                }
+            });
+        }
+        
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             updatePreview();
+            initializeEventListeners();
+            
+            // Set today's date as default if not already set
+            const today = new Date().toISOString().split('T')[0];
+            const invoiceDate = document.getElementById('invoiceDate');
+            if (!invoiceDate.value) {
+                invoiceDate.value = today;
+                updatePreview();
+            }
+            
+            // Check if mobile view and adjust display
+            if (window.innerWidth <= 992) {
+                document.getElementById('formSection').style.display = 'none';
+            }
         });
     </script>
 </body>
