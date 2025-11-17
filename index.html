@@ -123,22 +123,6 @@ Tamil Nadu, India</textarea>
                             <input type="text" id="companyGST" value="33AAAPL1234C1ZV" onchange="updatePreview()" 
                                    class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:border-primary focus:ring-2 focus:ring-blue-300 outline-none transition-all">
                         </div>
-                        
-                        <div>
-                            <label for="invoiceNumber" class="block mb-2 font-medium text-gray-700">
-                                <i class="fas fa-file-invoice mr-2 text-primary"></i> Invoice Number
-                            </label>
-                            <input type="text" id="invoiceNumber" value="INV-6" onchange="updatePreview()" 
-                                   class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:border-primary focus:ring-2 focus:ring-blue-300 outline-none transition-all">
-                        </div>
-                        
-                        <div>
-                            <label for="invoiceDate" class="block mb-2 font-medium text-gray-700">
-                                <i class="fas fa-calendar-alt mr-2 text-primary"></i> Invoice Date
-                            </label>
-                            <input type="date" id="invoiceDate" value="2025-10-18" onchange="updatePreview()" 
-                                   class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:border-primary focus:ring-2 focus:ring-blue-300 outline-none transition-all">
-                        </div>
                     </div>
                     
                     <div class="space-y-5">
@@ -161,10 +145,18 @@ Chennai - 600040</textarea>
                         </div>
                         
                         <div>
-                            <label for="customerGST" class="block mb-2 font-medium text-gray-700">
-                                <i class="fas fa-id-card mr-2 text-primary"></i> Customer GSTIN
+                            <label for="invoiceNumber" class="block mb-2 font-medium text-gray-700">
+                                <i class="fas fa-file-invoice mr-2 text-primary"></i> Invoice Number
                             </label>
-                            <input type="text" id="customerGST" value="33BBBPL5678D2ZV" onchange="updatePreview()" 
+                            <input type="text" id="invoiceNumber" value="INV-6" onchange="updatePreview()" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:border-primary focus:ring-2 focus:ring-blue-300 outline-none transition-all">
+                        </div>
+                        
+                        <div>
+                            <label for="invoiceDate" class="block mb-2 font-medium text-gray-700">
+                                <i class="fas fa-calendar-alt mr-2 text-primary"></i> Invoice Date
+                            </label>
+                            <input type="date" id="invoiceDate" value="2025-10-18" onchange="updatePreview()" 
                                    class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:border-primary focus:ring-2 focus:ring-blue-300 outline-none transition-all">
                         </div>
                     </div>
@@ -237,8 +229,7 @@ Chennai - 600040</textarea>
                                 <strong>R.PUGALMANI</strong><br>
                                 456, Customer Street,<br>
                                 Anna Nagar,<br>
-                                Chennai - 600040<br>
-                                GSTIN: 33BBBPL5678D2ZV
+                                Chennai - 600040
                             </div>
                         </div>
                     </div>
@@ -344,12 +335,10 @@ Chennai - 600040</textarea>
             // Update customer details
             const customerName = document.getElementById('customerName').value;
             const customerAddress = document.getElementById('customerAddress').value;
-            const customerGST = document.getElementById('customerGST').value;
             
             document.getElementById('previewCustomer').innerHTML = 
                 `<strong>${customerName}</strong><br>` +
-                customerAddress.replace(/\n/g, '<br>') + '<br>' +
-                `GSTIN: ${customerGST}`;
+                customerAddress.replace(/\n/g, '<br>');
             
             // Update invoice details
             document.getElementById('previewInvNo').textContent = document.getElementById('invoiceNumber').value;
@@ -551,7 +540,6 @@ Chennai - 600040</textarea>
                 companyGST: document.getElementById('companyGST').value,
                 customerName: document.getElementById('customerName').value,
                 customerAddress: document.getElementById('customerAddress').value,
-                customerGST: document.getElementById('customerGST').value,
                 invoiceNumber: document.getElementById('invoiceNumber').value,
                 invoiceDate: document.getElementById('invoiceDate').value,
                 items: []
@@ -596,7 +584,6 @@ Chennai - 600040</textarea>
                         document.getElementById('companyGST').value = invoiceData.companyGST || '';
                         document.getElementById('customerName').value = invoiceData.customerName || '';
                         document.getElementById('customerAddress').value = invoiceData.customerAddress || '';
-                        document.getElementById('customerGST').value = invoiceData.customerGST || '';
                         document.getElementById('invoiceNumber').value = invoiceData.invoiceNumber || '';
                         document.getElementById('invoiceDate').value = invoiceData.invoiceDate || '';
                         
