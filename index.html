@@ -483,6 +483,41 @@
             font-weight: 600;
         }
         
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            #printable-invoice, #printable-invoice * {
+                visibility: visible;
+            }
+            
+            #printable-invoice {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                margin: 0;
+            }
+            
+            .btn, .form-section, .header, .notification, .mobile-menu-btn {
+                display: none !important;
+            }
+            
+            .invoice-container {
+                border: none;
+                box-shadow: none;
+            }
+            
+            .watermark {
+                font-size: 120px;
+            }
+        }
+        
         /* Mobile Responsive Styles */
         @media (max-width: 992px) {
             .main-container {
@@ -604,30 +639,6 @@
                 font-size: 40px;
             }
         }
-        
-        /* Print Styles */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            
-            .invoice-container, .invoice-container * {
-                visibility: visible;
-            }
-            
-            .invoice-container {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                box-shadow: none;
-                border: none;
-            }
-            
-            .btn, .form-section, .header, .notification {
-                display: none !important;
-            }
-        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -735,6 +746,16 @@ Chennai - 600040</textarea>
                         <div class="invoice-title">TAX INVOICE</div>
                         <div class="invoice-subtitle">(Original for Recipient)</div>
                     </div>
+                                        <div class="invoice-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Invoice No:</span>
+                            <span class="detail-value" id="previewInvNo">INV-6</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Date:</span>
+                            <span class="detail-value" id="previewDate">18-Oct-2025</span>
+                        </div>
+                    </div>
                     
                     <div class="address-section">
                         <div class="address-box">
@@ -759,24 +780,7 @@ Chennai - 600040</textarea>
                         </div>
                     </div>
                     
-                    <div class="invoice-details">
-                        <div class="detail-item">
-                            <span class="detail-label">Invoice No:</span>
-                            <span class="detail-value" id="previewInvNo">INV-6</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Date:</span>
-                            <span class="detail-value" id="previewDate">18-Oct-2025</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">State:</span>
-                            <span class="detail-value">Tamil Nadu</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Code:</span>
-                            <span class="detail-value">33</span>
-                        </div>
-                    </div>
+
                     
                     <table class="items-table" id="itemsTable">
                         <thead>
@@ -853,6 +857,9 @@ Chennai - 600040</textarea>
     </div>
     
     <div id="notification" class="notification"></div>
+    
+    <!-- Hidden div for printing -->
+    <div id="printable-invoice" style="display: none;"></div>
     
     <script>
         let itemCount = 1;
@@ -999,44 +1006,86 @@ Chennai - 600040</textarea>
         }
         
         function downloadPDF() {
+            showNotification('Generating PDF...', 'warning');
+            
+            // Create a clone of the invoice for PDF generation
+            const invoiceElement = document.getElementById('invoicePreview');
+            const clone = invoiceElement.cloneNode(true);
+            
+            // Remove input elements and replace with text for PDF
+            const inputs = clone.querySelectorAll('input');
+            inputs.forEach(input => {
+                const span = document.createElement('span');
+                span.textContent = input.value;
+                span.style.display = 'inline-block';
+                span.style.minHeight = '20px';
+                input.parentNode.replaceChild(span, input);
+            });
+            
+            // Temporarily add the clone to the document for rendering
+            clone.style.position = 'absolute';
+            clone.style.left = '-9999px';
+            clone.style.width = '800px';
+            document.body.appendChild(clone);
+            
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
             
-            // Get the invoice preview element
-            const element = document.getElementById('invoicePreview');
-            
-            // Use html2canvas to convert the HTML to canvas
-            html2canvas(element, {
+            html2canvas(clone, {
                 scale: 2,
                 useCORS: true,
-                logging: false
+                logging: false,
+                width: clone.scrollWidth,
+                height: clone.scrollHeight,
+                windowWidth: clone.scrollWidth,
+                windowHeight: clone.scrollHeight
             }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
-                const pdfWidth = doc.internal.pageSize.getWidth();
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
                 
-                doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                doc.save(`Invoice_${document.getElementById('invoiceNumber').value}.pdf`);
+                // Add image to PDF
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                
+                // Save the PDF
+                pdf.save(`Invoice_${document.getElementById('invoiceNumber').value}.pdf`);
+                
+                // Remove the temporary clone
+                document.body.removeChild(clone);
+                
                 showNotification('PDF downloaded successfully');
             }).catch(error => {
                 console.error('Error generating PDF:', error);
-                showNotification('Error generating PDF', 'error');
+                document.body.removeChild(clone);
+                showNotification('Error generating PDF. Please try again.', 'error');
             });
         }
         
         function printInvoice() {
-            const printContent = document.getElementById('invoicePreview').innerHTML;
-            const originalContent = document.body.innerHTML;
+            // Create a clone of the invoice for printing
+            const invoiceElement = document.getElementById('invoicePreview');
+            const printContainer = document.getElementById('printable-invoice');
             
-            document.body.innerHTML = printContent;
+            // Clone the invoice and remove input elements
+            const clone = invoiceElement.cloneNode(true);
+            const inputs = clone.querySelectorAll('input');
+            inputs.forEach(input => {
+                const span = document.createElement('span');
+                span.textContent = input.value;
+                span.style.display = 'inline-block';
+                span.style.minHeight = '20px';
+                input.parentNode.replaceChild(span, input);
+            });
+            
+            // Update the print container
+            printContainer.innerHTML = '';
+            printContainer.appendChild(clone);
+            printContainer.style.display = 'block';
+            
+            // Trigger print
             window.print();
             
-            // Restore the original content after printing
-            setTimeout(() => {
-                document.body.innerHTML = originalContent;
-                // Re-initialize event listeners
-                initializeEventListeners();
-            }, 500);
+            showNotification('Print dialog opened');
         }
         
         function saveInvoice() {
@@ -1153,26 +1202,9 @@ Chennai - 600040</textarea>
             }, 3000);
         }
         
-        function initializeEventListeners() {
-            // Re-attach event listeners after page reload
-            document.getElementById('mobileMenuBtn').addEventListener('click', function() {
-                const formSection = document.getElementById('formSection');
-                const previewSection = document.getElementById('previewSection');
-                
-                if (formSection.style.display === 'none') {
-                    formSection.style.display = 'block';
-                    previewSection.style.display = 'block';
-                } else {
-                    formSection.style.display = 'none';
-                    previewSection.style.display = 'block';
-                }
-            });
-        }
-        
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             updatePreview();
-            initializeEventListeners();
             
             // Set today's date as default if not already set
             const today = new Date().toISOString().split('T')[0];
@@ -1186,6 +1218,11 @@ Chennai - 600040</textarea>
             if (window.innerWidth <= 992) {
                 document.getElementById('formSection').style.display = 'none';
             }
+            
+            // After print event, hide the printable invoice
+            window.addEventListener('afterprint', function() {
+                document.getElementById('printable-invoice').style.display = 'none';
+            });
         });
     </script>
 </body>
