@@ -45,9 +45,12 @@
             animation: slideIn 0.3s ease;
         }
         
+        /* Print-specific styles */
         @media print {
             body * {
                 visibility: hidden;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             
             #printable-invoice, #printable-invoice * {
@@ -55,28 +58,63 @@
             }
             
             #printable-invoice {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                box-shadow: none;
-                border: none;
-                padding: 0;
-                margin: 0;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: white !important;
+                font-size: 12px !important;
             }
             
-            .btn, .form-section, .header, .notification, .mobile-menu-btn {
+            #printable-invoice .invoice-container {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 15px !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            
+            #printable-invoice .watermark {
+                font-size: 100px !important;
+            }
+            
+            .btn, .form-section, .header, .notification, .mobile-menu-btn,
+            .main-container, .preview-section {
                 display: none !important;
             }
             
-            .invoice-container {
-                border: none;
-                box-shadow: none;
+            /* Ensure proper table layout in print */
+            #printable-invoice table {
+                width: 100% !important;
+                table-layout: fixed !important;
             }
             
-            .watermark {
-                font-size: 120px;
+            #printable-invoice table th,
+            #printable-invoice table td {
+                padding: 8px 4px !important;
+                font-size: 10px !important;
             }
+            
+            #printable-invoice .items-table th:nth-child(1),
+            #printable-invoice .items-table td:nth-child(1) { width: 5% !important; }
+            #printable-invoice .items-table th:nth-child(2),
+            #printable-invoice .items-table td:nth-child(2) { width: 35% !important; }
+            #printable-invoice .items-table th:nth-child(3),
+            #printable-invoice .items-table td:nth-child(3) { width: 10% !important; }
+            #printable-invoice .items-table th:nth-child(4),
+            #printable-invoice .items-table td:nth-child(4) { width: 10% !important; }
+            #printable-invoice .items-table th:nth-child(5),
+            #printable-invoice .items-table td:nth-child(5) { width: 15% !important; }
+            #printable-invoice .items-table th:nth-child(6),
+            #printable-invoice .items-table td:nth-child(6) { width: 10% !important; }
+            #printable-invoice .items-table th:nth-child(7),
+            #printable-invoice .items-table td:nth-child(7) { width: 15% !important; }
         }
     </style>
 </head>
@@ -443,71 +481,70 @@ Chennai - 600040</textarea>
         
         function downloadPDF() {
             showNotification('Generating PDF...', 'warning');
-            
-            // Create a clone of the invoice for PDF generation
+
             const invoiceElement = document.getElementById('invoicePreview');
             const clone = invoiceElement.cloneNode(true);
-            
-            // Remove input elements and replace with text for PDF
+
+            // Replace input fields with plain text
             const inputs = clone.querySelectorAll('input');
             inputs.forEach(input => {
                 const span = document.createElement('span');
                 span.textContent = input.value;
-                span.classList.add('inline-block', 'min-h-5', 'w-full', 'break-words', 'whitespace-normal');
+                span.style.display = "block";
                 input.parentNode.replaceChild(span, input);
             });
-            
-            // Ensure the signature section is properly included
-            const signatureSection = clone.querySelector('.signature-section');
-            if (signatureSection) {
-                const companySignature = signatureSection.querySelector('.signature-box:last-child');
-                if (companySignature) {
-                    // Make sure all text elements are visible
-                    const signatureTexts = companySignature.querySelectorAll('.signature-text');
-                    signatureTexts.forEach(text => {
-                        text.classList.add('block', 'visible', 'opacity-100');
-                    });
-                }
-            }
-            
-            // Temporarily add the clone to the document for rendering
-            clone.classList.add('absolute', 'left-[-9999px]', 'w-[800px]');
+
+            // FIX → Reduce width for proper A4 fit & add outer border
+            clone.style.width = "780px";           // Perfect for A4
+            clone.style.padding = "20px";
+            clone.style.border = "1px solid #444"; // Outer clean border
+            clone.style.boxSizing = "border-box";
+            clone.style.background = "#fff";
+
+            // Hide clone off-screen
+            clone.style.position = "absolute";
+            clone.style.left = "-9999px";
+
             document.body.appendChild(clone);
-            
+
             const { jsPDF } = window.jspdf;
-            
+
             html2canvas(clone, {
                 scale: 2,
-                useCORS: true,
-                logging: false,
-                width: clone.scrollWidth,
-                height: clone.scrollHeight,
-                windowWidth: clone.scrollWidth,
-                windowHeight: clone.scrollHeight
+                useCORS: true
             }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                
-                // Add image to PDF
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                
-                // Save the PDF
+
+                const imgData = canvas.toDataURL("image/png");
+                const pdf = new jsPDF("p", "mm", "a4");
+
+                // A4 size
+                const pdfWidth = 210;
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+
+                // Margins
+                const margin = 10;
+                const usableWidth = pdfWidth - margin * 2;
+                const usableHeight = (canvas.height * usableWidth) / canvas.width;
+
+                // Add final image (ONLY ONE — no duplicate!)
+                pdf.addImage(imgData, "PNG", margin, margin, usableWidth, usableHeight);
+
                 pdf.save(`Invoice_${document.getElementById('invoiceNumber').value}.pdf`);
-                
-                // Remove the temporary clone
+
                 document.body.removeChild(clone);
-                
                 showNotification('PDF downloaded successfully');
-            }).catch(error => {
-                console.error('Error generating PDF:', error);
+
+            }).catch(err => {
+                console.error(err);
                 document.body.removeChild(clone);
-                showNotification('Error generating PDF. Please try again.', 'error');
+                showNotification('PDF Generation Failed', 'error');
             });
         }
+
         
         function printInvoice() {
+            showNotification('Preparing for printing...', 'warning');
+            
             // Create a clone of the invoice for printing
             const invoiceElement = document.getElementById('invoicePreview');
             const printContainer = document.getElementById('printable-invoice');
@@ -522,15 +559,21 @@ Chennai - 600040</textarea>
                 input.parentNode.replaceChild(span, input);
             });
             
+            // Apply print-specific styling
+            clone.classList.add('w-full', 'max-w-full', 'p-4');
+            clone.style.width = '100%';
+            clone.style.maxWidth = '100%';
+            
             // Update the print container
             printContainer.innerHTML = '';
             printContainer.appendChild(clone);
             printContainer.classList.remove('hidden');
             
-            // Trigger print
-            window.print();
-            
-            showNotification('Print dialog opened');
+            // Small delay to ensure DOM is updated before printing
+            setTimeout(() => {
+                window.print();
+                showNotification('Print dialog opened');
+            }, 500);
         }
         
         function saveInvoice() {
@@ -679,6 +722,7 @@ Chennai - 600040</textarea>
             // After print event, hide the printable invoice
             window.addEventListener('afterprint', function() {
                 document.getElementById('printable-invoice').classList.add('hidden');
+                showNotification('Print completed');
             });
         });
     </script>
