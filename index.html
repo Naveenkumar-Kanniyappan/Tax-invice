@@ -197,6 +197,13 @@ Chennai - 600040</textarea>
                             <input type="date" id="invoiceDate" value="2025-10-18" onchange="updatePreview()" 
                                    class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:border-primary focus:ring-2 focus:ring-blue-300 outline-none transition-all">
                         </div>
+                        <div>
+    <label for="remarks" class="block mb-2 font-medium text-gray-700">
+        <i class="fas fa-comment mr-2 text-primary"></i> Remarks
+    </label>
+    <textarea id="remarks" onchange="updatePreview()" rows="2"
+              class="w-full p-3 border border-gray-300 rounded-lg text-sm resize-y focus:border-primary focus:ring-2 focus:ring-blue-300 outline-none transition-all"></textarea>
+</div>
                     </div>
                 </div>
                 
@@ -272,6 +279,7 @@ Chennai - 600040</textarea>
                         </div>
                     </div>
                     
+                    
                     <div class="overflow-x-auto mb-5">
                         <table class="items-table w-full border-collapse text-xs shadow-sm min-w-[600px]">
                             <thead>
@@ -323,6 +331,12 @@ Chennai - 600040</textarea>
                     <div class="amount-words mt-5 p-3 bg-gray-50 border border-dashed border-gray-500 text-xs italic rounded-lg">
                         <strong>Amount in Words:</strong> <span id="amountWords">Ninety Thousand Rupees Only</span>
                     </div>
+                   <div class="remarks-box mt-3 p-3 bg-gray-50 border border-gray-300 text-xs rounded-lg">
+                        <strong>Remarks:</strong><br>
+                        <span id="previewRemarks">-</span>
+                    </div>
+
+
                     
                     <div class="signature-section grid grid-cols-1 md:grid-cols-2 gap-5 mt-10 pt-5 border-t border-gray-300">
                         <div class="signature-box text-center">
@@ -364,6 +378,10 @@ Chennai - 600040</textarea>
             const companyName = document.getElementById('companyName').value;
             const companyAddress = document.getElementById('companyAddress').value;
             const companyGST = document.getElementById('companyGST').value;
+
+            document.getElementById('previewRemarks').innerHTML = 
+            document.getElementById('remarks').value.replace(/\n/g, "<br>") || "-";
+
             
             document.getElementById('previewCompany').innerHTML = 
                 `<strong>${companyName}</strong><br>` +
@@ -585,6 +603,8 @@ Chennai - 600040</textarea>
                 customerAddress: document.getElementById('customerAddress').value,
                 invoiceNumber: document.getElementById('invoiceNumber').value,
                 invoiceDate: document.getElementById('invoiceDate').value,
+                remarks: document.getElementById('remarks').value,
+
                 items: []
             };
             
@@ -629,6 +649,8 @@ Chennai - 600040</textarea>
                         document.getElementById('customerAddress').value = invoiceData.customerAddress || '';
                         document.getElementById('invoiceNumber').value = invoiceData.invoiceNumber || '';
                         document.getElementById('invoiceDate').value = invoiceData.invoiceDate || '';
+                        document.getElementById('remarks').value = invoiceData.remarks || "";
+
                         
                         // Clear existing items
                         const tbody = document.getElementById('itemsBody');
